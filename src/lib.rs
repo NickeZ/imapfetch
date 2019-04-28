@@ -1,5 +1,4 @@
-mod parser;
 mod file;
-
+mod parser;
 
 pub use file::Mboxfile;

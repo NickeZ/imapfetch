@@ -2,11 +2,11 @@ use std::io;
 use std::io::prelude::*;
 use std::path::PathBuf;
 
-use structopt::StructOpt;
+use env_logger;
 use imap;
 use native_tls;
 use rpassword;
-use env_logger;
+use structopt::StructOpt;
 
 use imapfetch;
 
@@ -40,21 +40,24 @@ type ImapSession = imap::Session<native_tls::TlsStream<std::net::TcpStream>>;
 
 #[derive(Debug, StructOpt)]
 struct Opt {
-    #[structopt(long="user", help="IMAP username")]
+    #[structopt(long = "user", help = "IMAP username")]
     user: String,
-    #[structopt(long="password", help="IMAP password")]
+    #[structopt(long = "password", help = "IMAP password")]
     password: Option<String>,
-    #[structopt(long="tls", help="Use tls (port 993)")]
+    #[structopt(long = "tls", help = "Use tls (port 993)")]
     tls: bool,
-    #[structopt(long="path", help="Specify output directory (default: current working directory)")]
+    #[structopt(
+        long = "path",
+        help = "Specify output directory (default: current working directory)"
+    )]
     path: Option<PathBuf>,
-    #[structopt(long="compress", help="Compress mbox file")]
+    #[structopt(long = "compress", help = "Compress mbox file")]
     compress: bool,
-    #[structopt(short="v", long="verbose", help="Print some more information")]
+    #[structopt(short = "v", long = "verbose", help = "Print some more information")]
     verbose: bool,
-    #[structopt(short="d", long="debug", help="Print debug information")]
+    #[structopt(short = "d", long = "debug", help = "Print debug information")]
     debug: bool,
-    #[structopt(help="IMAP host")]
+    #[structopt(help = "IMAP host")]
     host: String,
 }
 
@@ -62,7 +65,11 @@ struct Opt {
 fn get_names(session: &mut ImapSession) -> Result<Vec<(String, String)>, Error> {
     // Fetch the delimiter
     let list = session.list(None, None)?;
-    let hdelim = list.get(0).map(|name| name.delimiter()).ok_or(Error::NoDelimiter)?.ok_or(Error::NoDelimiter)?;
+    let hdelim = list
+        .get(0)
+        .map(|name| name.delimiter())
+        .ok_or(Error::NoDelimiter)?
+        .ok_or(Error::NoDelimiter)?;
     println!("hdelim: {}", hdelim);
 
     // Fetch list of all mailboxes
@@ -74,10 +81,9 @@ fn get_names(session: &mut ImapSession) -> Result<Vec<(String, String)>, Error> 
         res.push((item.name().to_string(), filename));
     }
     Ok(res)
-
 }
 
-fn main() -> Result<(), Error>{
+fn main() -> Result<(), Error> {
     env_logger::init();
     let opt = Opt::from_args();
 
@@ -97,7 +103,11 @@ fn main() -> Result<(), Error>{
 
     for name in names {
         // TODO: Check if file exists, collect all message ids
-        let mut file = std::fs::OpenOptions::new().write(true).create(true).truncate(true).open(name.1)?;
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open(name.1)?;
         // open mailbox in readonly mode
         let mailbox = imap_session.examine(name.0).unwrap();
 
@@ -105,9 +115,9 @@ fn main() -> Result<(), Error>{
 
         // Get message-id / uid for all e-mails, take 100 at a time
         const CHUNK_SIZE: u32 = 100;
-        for i in 1..mailbox.exists/CHUNK_SIZE {
-            let start = (i-1)*CHUNK_SIZE+1;
-            let end = std::cmp::min(i*CHUNK_SIZE, mailbox.exists);
+        for i in 1..mailbox.exists / CHUNK_SIZE {
+            let start = (i - 1) * CHUNK_SIZE + 1;
+            let end = std::cmp::min(i * CHUNK_SIZE, mailbox.exists);
             let seq = format!("{}:{}", start, end);
             //let seq = format!("{}", i);
             println!("Fetching {}", seq);
@@ -137,7 +147,7 @@ fn main() -> Result<(), Error>{
                 if let Some(body) = message.body() {
                     file.write(b"From \r\n")?;
                     file.write(body)?;
-                    if &body[body.len()-2..body.len()] == &b"\r\n"[..] {
+                    if &body[body.len() - 2..body.len()] == &b"\r\n"[..] {
                         file.write(b"\r\n")?;
                     } else {
                         file.write(b"\r\n\r\n")?;
@@ -151,7 +161,6 @@ fn main() -> Result<(), Error>{
 
         // TODO: Write new files to disk
     }
-
 
     // let mbox = imapfetch::Mboxfile::from_file(&opt.path)?;
 

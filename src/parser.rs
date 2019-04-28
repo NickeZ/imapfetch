@@ -20,9 +20,7 @@ use std::io::prelude::*;
 /// these lines if they are already escaped or quoted, while others
 /// ignore these mechanisms altogether.
 
-
-
-pub struct Parser<'a>{
+pub struct Parser<'a> {
     buf: &'a [u8],
 }
 
@@ -40,9 +38,9 @@ pub fn read_until(buf: &[u8], needle: &[u8]) -> Result<usize, ()> {
     if needle.len() > buf.len() {
         return Err(());
     }
-    for i in 0..(buf.len()-needle.len()) {
-        if &buf[i..i+needle.len()] == needle {
-            return Ok(i+1);
+    for i in 0..(buf.len() - needle.len()) {
+        if &buf[i..i + needle.len()] == needle {
+            return Ok(i + 1);
         }
     }
     Err(())
@@ -57,8 +55,8 @@ impl<'a> Iterator for Parser<'a> {
         let start = read_until(&self.buf, b"\n").ok()?;
         match read_until(&self.buf, FROM) {
             Ok(end) => {
-                let res = &self.buf[start..end+1];
-                self.buf = &self.buf[end+FROM.len()..];
+                let res = &self.buf[start..end + 1];
+                self.buf = &self.buf[end + FROM.len()..];
                 Some(res)
             }
             Err(()) => {
