@@ -1,0 +1,3 @@
+[submodule "rust-imap"]
+	path = rust-imap
+	url = git@github.com:NickeZ/rust-imap
