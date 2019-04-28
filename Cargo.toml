@@ -1,0 +1,15 @@
+[package]
+authors = ["Niklas Claesson <nicke.claesson@gmail.com>"]
+edition = "2018"
+name = "imapfetch"
+version = "0.1.0"
+
+[[bin]]
+name = "imapfetch"
+
+[dependencies]
+memmap = "0.7.0"
+structopt = "0.2.15"
+
+[lib]
+name = "imapfetch"
