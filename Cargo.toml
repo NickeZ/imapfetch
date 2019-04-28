@@ -9,6 +9,7 @@ name = "imapfetch"
 
 [dependencies]
 env_logger = "0.6.1"
+log = "0.4.6"
 memmap = "0.7.0"
 native-tls = "0.2.3"
 rpassword = "3.0.2"
