@@ -35,6 +35,10 @@ impl<'a> Entry<'a> {
     pub fn new(data: &'a [u8], idx: usize) -> Entry<'a> {
         Entry { data, idx }
     }
+
+    pub fn data(&self) -> &'a [u8] {
+        self.data
+    }
 }
 
 impl<'a> fmt::Debug for Entry<'a> {
